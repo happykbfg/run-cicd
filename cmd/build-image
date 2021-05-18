@@ -8,25 +8,20 @@ echo ""
 echo "STEP1: Get Parameters"
 
 # get parameters
-if ([ $# -lt 4 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
-  echo "build-image <reg username> <reg password> <root directory> <dev lang>"
-  echo " reg username: container image registry username "
-  echo " reg password: container image registry password "
+if ([ $# -lt 2 ]) || ([ $# -eq 1 ] && [ "$1" == "-h" -o "$1" == "--help" ]); then
+  echo "build-image <root directory> <dev lang>"
   echo " root directory: project의 최상위 디렉토리. '.'은 현재 디렉토리 의미함. "
   echo " dev lang: 개발 언어 (java, react, nodejs)"
-  echo " config server: config server ingress name "
-  echo " ex) ./build-image user1 password1 ~/work java"
-  echo " ex) ./build-image user1 password1 . react"
+  echo " ex) ./build-image ~/work java"
+  echo " ex) ./build-image . react"
   exit 1
 fi
 
-username=$1
-password=$2
-basedir=$3
-devlang=$4
+basedir=$1
+devlang=$2
 
-if [ $# -eq 5 ]; then 
-  CTRLDIR=$5
+if [ $# -eq 3 ]; then 
+  CTRLDIR=$3
 fi
 
 echo ""
