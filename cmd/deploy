@@ -68,10 +68,7 @@ fi
 
 # get namespace
 file1=""
-if [ -f ${basedir}/deploy/cicd.properties ]; then  # use config server 
-  file1=cicd.properties
-  ns=`cat ${basedir}/deploy/${file1} | grep namespace= | cut -d "=" -f 2`
-elif [ -f ${basedir}/cicd/cicd-${profile}.properties ]; then
+if [ -f ${basedir}/cicd/cicd-${profile}.properties ]; then
   file1=cicd-${profile}.properties
   ns=`cat ${basedir}/cicd/${file1} | grep namespace= | cut -d "=" -f 2`
 elif [ -f ${basedir}/cicd/cicd-common.properties ]; then
@@ -93,19 +90,15 @@ echo ""
 # set variables from config.properties: converted from '.' to '_'
 echo "STEP2. Set environment variables "
 
-if [ -f ${basedir}/deploy/cicd.properties ]; then
-  eval $(${CTRLDIR}/cmd/set-env ${basedir}/deploy/cicd.properties)
-else
-  if [ -f ${basedir}/cicd/cicd-common.properties ]; then  #NOT use config server 
-    cat ${basedir}/cicd/cicd-common.properties > ${basedir}/deploy/cicd.properties
-    eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-common.properties)
-  fi
-  if [ -f ${basedir}/cicd/cicd-${profile}.properties ]; then  #NOT use config server 
-    echo " " >> ${basedir}/deploy/cicd.properties
-    echo "# ${profile} " >> ${basedir}/deploy/cicd.properties
-    cat ${basedir}/cicd/cicd-${profile}.properties >> ${basedir}/deploy/cicd.properties
-    eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-${profile}.properties)
-  fi
+if [ -f ${basedir}/cicd/cicd-common.properties ]; then  #NOT use config server 
+  cat ${basedir}/cicd/cicd-common.properties > ${basedir}/deploy/cicd.properties
+  eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-common.properties)
+fi
+if [ -f ${basedir}/cicd/cicd-${profile}.properties ]; then  #NOT use config server 
+  echo " " >> ${basedir}/deploy/cicd.properties
+  echo "# ${profile} " >> ${basedir}/deploy/cicd.properties
+  cat ${basedir}/cicd/cicd-${profile}.properties >> ${basedir}/deploy/cicd.properties
+  eval $(${CTRLDIR}/cmd/set-env ${basedir}/cicd/cicd-${profile}.properties)
 fi
 
 # Get Workload kind 
@@ -151,16 +144,6 @@ filepath=${basedir}/deploy/cm-converted.properties
 tmp=${basedir}/deploy/tmp-cm.env
 touch ${tmp}
 
-# 현재 배포 대상 profile에 맞는 변수 셋팅을 위해 _dev또는 _prod붙어 있는 변수에서 _dev또는_prod를 제거함
-# 예) mq_host_dev => mq_host
-if [ -f ${basedir}/deploy/cm.properties ]; then  # use config server 
-  sed "s@_${profile}=@=@g" ${basedir}/deploy/cm.properties > ${filepath}
-  cp ${filepath} ${tmp}
-  echo "" >> ${tmp}
-fi
-# add cicd.properties to environments
-cat ${basedir}/deploy/cicd.properties >> ${tmp}
-
 # project폴더의 cm-common.env, cm-{profile}.env파일 내용을 추가
 if [ -f ${basedir}/cicd/cm-common.env ]; then
   cat ${basedir}/cicd/cm-common.env >> ${tmp}
@@ -185,11 +168,6 @@ filepath=${basedir}/deploy/secret-converted.properties
 tmp=${basedir}/deploy/tmp-secret.env
 touch ${tmp}
 
-if [ -f ${basedir}/deploy/secret.properties ]; then
-  sed "s@_${profile}=@=@g" ${basedir}/deploy/secret.properties > ${filepath}
-  cp ${filepath} ${tmp}
-  echo "" >> ${tmp}
-fi
 # project폴더의 secret-common.env, secret-{profile}.env파일 내용을 추가
 if [ -f ${basedir}/cicd/secret-common.env ]; then
   cat ${basedir}/cicd/secret-common.env >> ${tmp}
