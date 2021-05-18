@@ -3,7 +3,7 @@
 CTRLDIR=~/run-cicd
 
 echo ""
-echo "************* RUN BUILD&PUSH Container image *****************"
+echo "************* RUN BUILD Container image *****************"
 echo ""
 echo "STEP1: Get Parameters"
 
@@ -91,25 +91,7 @@ if [ $? -eq 1 ]; then
   exit 1
 fi
 
-# login image registry to push image: parameters are provided from bamboo pipeline.
-echo "STEP5. Login & Push image "
-docker login ${image_registry} -u  ${username} -p ${password}
-if [ $? == 1 ]; then
-  echo "****** FAIL to login image registry: username is $1"
-  exit 1
-fi
-
-# clone image as 'latest'
-echo "*** RUN -> docker tag ${image_registry}/${image_project}/${image_repository}:${image_tag} ${image_registry}/${image_project}/${image_repository}:latest"
-docker tag ${image_registry}/${image_project}/${image_repository}:${image_tag} ${image_registry}/${image_project}/${image_repository}:latest
-
-# push them
-echo "*** RUN -> docker push ${image_registry}/${image_project}/${image_repository}:${image_tag}"
-docker push ${image_registry}/${image_project}/${image_repository}:${image_tag}
-echo "*** RUN -> docker push ${image_registry}/${image_project}/${image_repository}:latest"
-docker push ${image_registry}/${image_project}/${image_repository}:latest
-
 echo ""
-echo "************* END BUILD&PUSH Container image *****************"
+echo "************* END BUILD Container image *****************"
 echo ""
 exit 0
